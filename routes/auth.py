@@ -69,14 +69,24 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        # Send verification email
+        # Send verification email in background to prevent blocking
         verification_url = url_for('auth.verify_email',
                                    token=user.email_verification_token,
                                    _external=True)
 
-        if email_service.send_email_verification(email, first_name, verification_url):
+        # Try to send email but don't block the response
+        try:
+            from threading import Thread
+            def send_email_async():
+                try:
+                    email_service.send_email_verification(email, first_name, verification_url)
+                except Exception as e:
+                    current_app.logger.error(f"Failed to send verification email: {e}")
+
+            Thread(target=send_email_async, daemon=True).start()
             flash('Registration successful! Please check your email to verify your account.', 'success')
-        else:
+        except Exception as e:
+            current_app.logger.error(f"Failed to start email thread: {e}")
             flash('Registration successful! However, we couldn\'t send the verification email. Please try to resend it.', 'warning')
 
         return redirect(url_for('auth.login'))

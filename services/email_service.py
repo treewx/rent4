@@ -39,7 +39,7 @@ class EmailService:
             html_part = MIMEText(html_body, 'html')
             msg.attach(html_part)
 
-            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+            with smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=30) as server:
                 server.starttls()
                 server.login(self.sender_email, self.sender_password)
                 server.send_message(msg)
