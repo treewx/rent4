@@ -22,6 +22,10 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://localhost:5432/rent4')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    # CSRF Configuration for production
+    app.config['WTF_CSRF_TIME_LIMIT'] = 3600  # 1 hour
+    app.config['WTF_CSRF_SSL_STRICT'] = False  # Allow HTTPS behind proxy
+
     # Initialize extensions
     db.init_app(app)
     csrf.init_app(app)
