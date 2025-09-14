@@ -65,13 +65,19 @@ def create_app():
     try:
         with app.app_context():
             db.create_all()
+            print("Database tables created successfully")
     except Exception as e:
         print(f"Database connection failed: {e}")
         print("Database tables will be created automatically when deployed")
 
-    # Initialize scheduler
-    from services.scheduler import init_scheduler
-    init_scheduler(app)
+    # Initialize scheduler (with error handling)
+    try:
+        from services.scheduler import init_scheduler
+        init_scheduler(app)
+        print("Scheduler initialized successfully")
+    except Exception as e:
+        print(f"Scheduler initialization failed: {e}")
+        print("Scheduler will be disabled")
 
     return app
 

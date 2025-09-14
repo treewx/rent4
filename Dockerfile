@@ -23,4 +23,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application (Railway will provide PORT at runtime)
-CMD gunicorn app:app --bind 0.0.0.0:$PORT
+CMD gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 1 --max-requests 1000
