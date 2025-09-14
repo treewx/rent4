@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Bank Integration - Rent4{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    <i class="bi bi-bank"></i> Bank Integration Setup
+                </h2>
+
+                <div class="alert alert-info" role="alert">
+                    <h5 class="alert-heading">
+                        <i class="bi bi-info-circle"></i> Akahu Integration
+                    </h5>
+                    <p>To enable automatic rent tracking, you need to connect your bank account through Akahu.</p>
+                    <p class="mb-0">
+                        Don't have Akahu tokens?
+                        <a href="https://akahu.nz" target="_blank" class="alert-link">Visit Akahu</a>
+                        to create an account and get your API tokens.
+                    </p>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                    <div class="mb-3">
+                        <label for="app_token" class="form-label">Akahu App Token *</label>
+                        <input type="password" class="form-control" id="app_token" name="app_token"
+                               {% if current_user.akahu_app_token %}placeholder="••••••••••••••••••••••••••••••••"{% endif %} required>
+                        <div class="form-text">Your Akahu application token for API access</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="user_token" class="form-label">Akahu User Token *</label>
+                        <input type="password" class="form-control" id="user_token" name="user_token"
+                               {% if current_user.akahu_user_token %}placeholder="••••••••••••••••••••••••••••••••"{% endif %} required>
+                        <div class="form-text">Your Akahu user token for account access</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i>
+                            {% if current_user.akahu_app_token and current_user.akahu_user_token %}
+                                Update Integration
+                            {% else %}
+                                Set Up Integration
+                            {% endif %}
+                        </button>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+
+                {% if current_user.akahu_app_token and current_user.akahu_user_token %}
+                <div class="mt-4">
+                    <div class="alert alert-success" role="alert">
+                        <i class="bi bi-check-circle"></i> Bank integration is currently configured and active.
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-question-circle"></i> About Akahu
+                </h5>
+                <p>Akahu is New Zealand's leading open banking platform that provides secure access to your bank account data.</p>
+
+                <h6>Security</h6>
+                <ul>
+                    <li>Bank-level security and encryption</li>
+                    <li>Read-only access to your accounts</li>
+                    <li>Compliant with NZ banking regulations</li>
+                </ul>
+
+                <h6>Supported Banks</h6>
+                <ul>
+                    <li>ANZ New Zealand</li>
+                    <li>ASB Bank</li>
+                    <li>Bank of New Zealand</li>
+                    <li>Westpac New Zealand</li>
+                    <li>Kiwibank</li>
+                    <li>And more...</li>
+                </ul>
+
+                <a href="https://akahu.nz" target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-box-arrow-up-right"></i> Visit Akahu
+                </a>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-shield-check"></i> Privacy & Security
+                </h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="bi bi-lock text-success"></i>
+                        Your tokens are encrypted and stored securely
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-eye-slash text-success"></i>
+                        We only access transaction data for rent matching
+                    </li>
+                    <li class="mb-0">
+                        <i class="bi bi-trash text-success"></i>
+                        You can disconnect at any time
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

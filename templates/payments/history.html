@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Payment History - {{ property.address }} - Rent4{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>Payment History</h1>
+        <p class="text-muted mb-0">{{ property.address }}</p>
+    </div>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h4 class="text-primary">{{ payments|selectattr('status', 'equalto', 'received')|list|length }}</h4>
+                <p class="mb-0">Received</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h4 class="text-warning">{{ payments|selectattr('status', 'equalto', 'partial')|list|length }}</h4>
+                <p class="mb-0">Partial</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h4 class="text-danger">{{ payments|selectattr('status', 'equalto', 'missed')|list|length }}</h4>
+                <p class="mb-0">Missed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h4 class="text-info">{{ payments|length }}</h4>
+                <p class="mb-0">Total Records</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-clock-history"></i> Payment History
+        </h5>
+    </div>
+    <div class="card-body">
+        {% if payments %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Due Date</th>
+                        <th>Expected Amount</th>
+                        <th>Received Amount</th>
+                        <th>Status</th>
+                        <th>Received Date</th>
+                        <th>Transaction</th>
+                        <th>Notifications</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td>{{ payment.due_date.strftime('%Y-%m-%d') }}</td>
+                        <td>${{ payment.expected_amount }}</td>
+                        <td>
+                            {% if payment.actual_amount %}
+                                ${{ payment.actual_amount }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if payment.status == 'received' %}
+                                <span class="badge bg-success">Received</span>
+                            {% elif payment.status == 'partial' %}
+                                <span class="badge bg-warning">Partial</span>
+                            {% elif payment.status == 'missed' %}
+                                <span class="badge bg-danger">Missed</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ payment.status|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if payment.received_date %}
+                                {{ payment.received_date.strftime('%Y-%m-%d') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if payment.transaction_description %}
+                                <small class="text-muted">{{ payment.transaction_description[:50] }}{% if payment.transaction_description|length > 50 %}...{% endif %}</small>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                {% if payment.landlord_notified %}
+                                    <i class="bi bi-envelope-check text-success" title="Landlord notified"></i>
+                                {% endif %}
+                                {% if payment.tenant_notified %}
+                                    <i class="bi bi-person-check text-info" title="Tenant notified"></i>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-clock-history text-muted" style="font-size: 3rem;"></i>
+            <h4 class="text-muted mt-3">No Payment History</h4>
+            <p class="text-muted">Payment tracking will appear here once rent payments are due and processed.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if payments %}
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="bi bi-info-circle"></i> Property Details
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Tenant:</strong> {{ property.tenant_name }}</p>
+                <p><strong>Email:</strong> {{ property.tenant_email }}</p>
+                <p><strong>Rent Amount:</strong> ${{ property.rent_amount }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Frequency:</strong> {{ property.rent_frequency }}</p>
+                <p>
+                    <strong>Due:</strong>
+                    {% if property.rent_frequency in ['Weekly', 'Fortnightly'] %}
+                        {{ ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][property.rent_due_day_of_week] }}s
+                    {% else %}
+                        {{ property.rent_due_day }}{{ 'st' if property.rent_due_day == 1 else 'nd' if property.rent_due_day == 2 else 'rd' if property.rent_due_day == 3 else 'th' }} of each month
+                    {% endif %}
+                </p>
+                <p>
+                    <strong>Tenant Reminders:</strong>
+                    {% if property.send_tenant_reminder %}
+                        <span class="badge bg-success">Enabled</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Disabled</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

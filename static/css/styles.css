@@ -1,0 +1,97 @@
+/* Custom styles for Rent4 */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.property-card {
+    border-left: 4px solid #007bff;
+}
+
+.property-card.premium {
+    border-left-color: #28a745;
+}
+
+.btn-outline-primary:hover {
+    transform: translateY(-1px);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.alert {
+    border: none;
+    border-radius: 0.5rem;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn {
+    border-radius: 0.375rem;
+    font-weight: 500;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 3rem;
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.dashboard-stats .card {
+    border-top: 4px solid #007bff;
+}
+
+.dashboard-stats .card:nth-child(2) {
+    border-top-color: #28a745;
+}
+
+.dashboard-stats .card:nth-child(3) {
+    border-top-color: #ffc107;
+}
+
+.dashboard-stats .card:nth-child(4) {
+    border-top-color: #dc3545;
+}

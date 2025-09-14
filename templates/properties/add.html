@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block title %}Add Property - Rent4{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title mb-4">
+                    <i class="bi bi-plus-circle"></i> Add New Property
+                </h2>
+
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Property Address *</label>
+                        <textarea class="form-control" id="address" name="address" rows="2" required placeholder="123 Main Street, Auckland, New Zealand"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tenant_name" class="form-label">Tenant Name *</label>
+                                <input type="text" class="form-control" id="tenant_name" name="tenant_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tenant_email" class="form-label">Tenant Email *</label>
+                                <input type="email" class="form-control" id="tenant_email" name="tenant_email" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="rent_amount" class="form-label">Rent Amount (NZD) *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" class="form-control" id="rent_amount" name="rent_amount" step="0.01" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="rent_frequency" class="form-label">Rent Frequency *</label>
+                                <select class="form-select" id="rent_frequency" name="rent_frequency" required onchange="toggleDueDate()">
+                                    <option value="">Select frequency</option>
+                                    <option value="Weekly">Weekly</option>
+                                    <option value="Fortnightly">Fortnightly</option>
+                                    <option value="Monthly">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6" id="day-of-week-group" style="display: none;">
+                            <div class="mb-3">
+                                <label for="rent_due_day_of_week" class="form-label">Rent Due Day of Week *</label>
+                                <select class="form-select" id="rent_due_day_of_week" name="rent_due_day_of_week">
+                                    <option value="">Select day</option>
+                                    <option value="0">Monday</option>
+                                    <option value="1">Tuesday</option>
+                                    <option value="2">Wednesday</option>
+                                    <option value="3">Thursday</option>
+                                    <option value="4">Friday</option>
+                                    <option value="5">Saturday</option>
+                                    <option value="6">Sunday</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6" id="day-of-month-group" style="display: none;">
+                            <div class="mb-3">
+                                <label for="rent_due_day" class="form-label">Rent Due Day of Month *</label>
+                                <select class="form-select" id="rent_due_day" name="rent_due_day">
+                                    <option value="">Select day</option>
+                                    {% for i in range(1, 32) %}
+                                    <option value="{{ i }}">{{ i }}{{ 'st' if i == 1 or i == 21 or i == 31 else 'nd' if i == 2 or i == 22 else 'rd' if i == 3 or i == 23 else 'th' }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="bank_statement_keyword" class="form-label">Bank Statement Keyword *</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="bank_statement_keyword" name="bank_statement_keyword" required placeholder="e.g., RENT PAYMENT, JOHN SMITH">
+                            <button class="btn btn-outline-secondary" type="button" onclick="searchTransactions()">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Enter a keyword that appears in rent payments on your bank statement. Use the search button to find actual transactions.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="send_tenant_reminder" name="send_tenant_reminder">
+                            <label class="form-check-label" for="send_tenant_reminder">
+                                Send email to tenant when rent is missed
+                            </label>
+                        </div>
+                        <div class="form-text">When enabled, your tenant will receive an automated reminder email if rent is not received on time.</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Add Property
+                        </button>
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-info-circle"></i> Tips
+                </h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                        Be specific with your bank statement keyword to avoid false matches
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                        Use the search function to find actual transactions from your bank
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-check-circle text-success"></i>
+                        Enable tenant reminders for automatic follow-up on missed payments
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Search Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Rent Payment Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Select a recent rent payment transaction to automatically populate the form:</p>
+                <div id="transactionList">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleDueDate() {
+    const frequency = document.getElementById('rent_frequency').value;
+    const dayOfWeekGroup = document.getElementById('day-of-week-group');
+    const dayOfMonthGroup = document.getElementById('day-of-month-group');
+
+    if (frequency === 'Weekly' || frequency === 'Fortnightly') {
+        dayOfWeekGroup.style.display = 'block';
+        dayOfMonthGroup.style.display = 'none';
+        document.getElementById('rent_due_day_of_week').required = true;
+        document.getElementById('rent_due_day').required = false;
+    } else if (frequency === 'Monthly') {
+        dayOfWeekGroup.style.display = 'none';
+        dayOfMonthGroup.style.display = 'block';
+        document.getElementById('rent_due_day_of_week').required = false;
+        document.getElementById('rent_due_day').required = true;
+    } else {
+        dayOfWeekGroup.style.display = 'none';
+        dayOfMonthGroup.style.display = 'none';
+        document.getElementById('rent_due_day_of_week').required = false;
+        document.getElementById('rent_due_day').required = false;
+    }
+}
+
+function searchTransactions() {
+    const modal = new bootstrap.Modal(document.getElementById('transactionModal'));
+    modal.show();
+
+    // TODO: Implement actual transaction search
+    setTimeout(() => {
+        document.getElementById('transactionList').innerHTML = `
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i>
+                Transaction search will be available once you set up your bank integration.
+                <a href="{{ url_for('akahu.setup') }}" class="alert-link">Set up now</a>
+            </div>
+        `;
+    }, 1000);
+}
+</script>
+{% endblock %}
